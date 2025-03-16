@@ -102,8 +102,10 @@ def run_validation(model: nn.Module,
             encoder_output = model.encode(encoder_input, encoder_mask)
             decoder_input = torch.empty(1, 1).fill_(cls_id).type_as(encoder_input).to(device)
 
+            max_length = getattr(model, 'max_seq_len', 512)  # Default to 512 if not set
+            
             while True:
-                if decoder_input.size(1) == model.max_seq_len:
+                if decoder_input.size(1) >= max_length:
                     break
 
                 decoder_mask = causal_mask(decoder_input.size(1)).type_as(encoder_mask).to(device)

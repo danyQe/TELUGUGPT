@@ -83,7 +83,7 @@ class Transformer(nn.Module):
     def __init__(self, encoder: Encoder, decoder: Decoder,
                  source_embed: EmbeddingLayer, target_embed: EmbeddingLayer,
                  source_pos: PositionalEncoding, target_pos: PositionalEncoding,
-                 projection_layer: ProjectionLayer):
+                 projection_layer: ProjectionLayer, max_seq_len: int):
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
@@ -92,6 +92,7 @@ class Transformer(nn.Module):
         self.source_pos = source_pos
         self.target_pos = target_pos
         self.projection_layer = projection_layer
+        self.max_seq_len = max_seq_len
 
     def encode(self, encoder_input, encoder_mask):
         encoder_input = self.source_embed(encoder_input)
@@ -139,7 +140,8 @@ def build_transformer(source_vocab_size: int, target_vocab_size: int,
     projection_layer = ProjectionLayer(d_model, target_vocab_size)
 
     model = Transformer(encoder, decoder, source_embed, target_embed,
-                       source_pos, target_pos, projection_layer)
+                       source_pos, target_pos, projection_layer,
+                       max_seq_len=source_seq_len)
 
     for p in model.parameters():
         if p.dim() > 1:

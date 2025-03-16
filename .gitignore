@@ -8,4 +8,4 @@ __pycache__/
 *.json
 Tokenizer_en/
 Tokenizer_te/
-
+telugugpt.py
