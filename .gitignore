@@ -1,0 +1,11 @@
+Telugu_GPT/
+venv/
+__pycache__/
+*.pyc
+*.pt
+*.pth
+*.pkl
+*.json
+Tokenizer_en/
+Tokenizer_te/
+
