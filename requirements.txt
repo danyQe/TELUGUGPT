@@ -4,5 +4,3 @@ datasets
 tqdm
 pandas
 numpy
-itertools
-
