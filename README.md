@@ -9,6 +9,7 @@ TeluguGPT is a state-of-the-art neural machine translation model that translates
 - [Usage](#usage)
 - [Model Architecture](#model-architecture)
 - [Training](#training)
+- [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -137,7 +138,7 @@ The model is trained on the [Telugu-LLM-Labs/telugu_alpaca_yahma_cleaned_filtere
 
 ### Training Process
 1. **Data Preprocessing**:
-   - Text tokenization using BPE
+   - Text tokenization using BPE (30K vocabulary size for each language)
    - Dynamic sequence padding
    - Mask generation for attention
 
@@ -158,6 +159,95 @@ The model saves checkpoints after each epoch in the `./TeluguGPT/` directory wit
 - Optimizer state dict
 - Current epoch
 - Global step
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Tokenizer Training Error**
+   ```python
+   TypeError: 'NoneType' object cannot be interpreted as an integer
+   ```
+   **Solution**: This error occurs if the vocabulary size is not properly set. The default vocabulary size is 30,000 tokens for each language. You can modify this in `config.py`:
+   ```python
+   TOKENIZER_CONFIG = {
+       "en_vocab_size": 30000,
+       "te_vocab_size": 30000,
+       "min_frequency": 2
+   }
+   ```
+
+2. **CUDA Out of Memory**
+   ```python
+   RuntimeError: CUDA out of memory
+   ```
+   **Solution**: Reduce batch size or use gradient accumulation. In `config.py`:
+   ```python
+   TRAINING_CONFIG = {
+       "batch_size": 1,  # Reduce this
+       "gradient_accumulation_steps": 8  # Increase this
+   }
+   ```
+
+3. **Dataset Loading Issues**
+   ```python
+   FileNotFoundError: Dataset not found
+   ```
+   **Solution**: Ensure you have internet connection for first-time dataset download. The dataset will be cached locally after first download.
+
+4. **Tokenizer File Not Found**
+   ```python
+   FileNotFoundError: Tokenizer file not found
+   ```
+   **Solution**: Ensure the tokenizer directories exist and have write permissions:
+   ```bash
+   mkdir -p Tokenizer_en Tokenizer_te
+   chmod 755 Tokenizer_en Tokenizer_te
+   ```
+
+### Performance Optimization
+
+1. **Training Speed**
+   - Use a GPU with CUDA support
+   - Increase batch size if memory allows
+   - Use mixed precision training (FP16)
+   - Optimize number of workers in DataLoader
+
+2. **Memory Usage**
+   - Monitor GPU memory usage with `nvidia-smi`
+   - Use gradient checkpointing for large models
+   - Clear cache periodically: `torch.cuda.empty_cache()`
+
+3. **Translation Quality**
+   - Increase vocabulary size for better coverage
+   - Adjust beam search parameters
+   - Fine-tune dropout rates
+   - Experiment with learning rate schedules
+
+### Environment Setup
+
+1. **CUDA Setup**
+   Check CUDA availability:
+   ```python
+   import torch
+   print(f"CUDA available: {torch.cuda.is_available()}")
+   print(f"CUDA device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
+   ```
+
+2. **Dependencies**
+   If you encounter dependency conflicts:
+   ```bash
+   pip install -r requirements.txt --no-cache-dir
+   ```
+
+3. **Virtual Environment**
+   If venv creation fails:
+   ```bash
+   python -m pip install --user virtualenv
+   python -m virtualenv venv
+   ```
+
+For more detailed troubleshooting and optimization tips, please check our [Wiki](https://github.com/yourusername/TeluguGPT/wiki) or open an issue.
 
 ## Contributing
 

@@ -14,8 +14,18 @@ def get_ds_iterator(raw_dataset, field: str) -> Iterator[str]:
 def train_tokenizer(raw_train_dataset,
                    fields: List[str],
                    save_path: str,
-                   vocab_size: Optional[int] = None) -> Tokenizer:
-    """Train a BPE tokenizer on the given dataset fields."""
+                   vocab_size: Optional[int] = 30000) -> Tokenizer:
+    """Train a BPE tokenizer on the given dataset fields.
+    
+    Args:
+        raw_train_dataset: Dataset containing text fields
+        fields: List of field names to use for training
+        save_path: Path to save the trained tokenizer
+        vocab_size: Maximum vocabulary size (default: 30000)
+    
+    Returns:
+        Trained tokenizer
+    """
     
     tokenizer = Tokenizer(BPE(unk_token="[UNK]"))
     trainer = BpeTrainer(
@@ -41,27 +51,52 @@ def create_tokenizers(raw_train_dataset,
                      english_fields: List[str],
                      telugu_fields: List[str],
                      en_save_path: str,
-                     te_save_path: str) -> tuple[Tokenizer, Tokenizer]:
-    """Create and train tokenizers for both English and Telugu."""
+                     te_save_path: str,
+                     en_vocab_size: int = 30000,
+                     te_vocab_size: int = 30000) -> tuple[Tokenizer, Tokenizer]:
+    """Create and train tokenizers for both English and Telugu.
+    
+    Args:
+        raw_train_dataset: Dataset containing both English and Telugu text
+        english_fields: List of English field names
+        telugu_fields: List of Telugu field names
+        en_save_path: Path to save English tokenizer
+        te_save_path: Path to save Telugu tokenizer
+        en_vocab_size: Maximum vocabulary size for English (default: 30000)
+        te_vocab_size: Maximum vocabulary size for Telugu (default: 30000)
+    
+    Returns:
+        Tuple of (English tokenizer, Telugu tokenizer)
+    """
     
     # Train English tokenizer
     tokenizer_en = train_tokenizer(
         raw_train_dataset,
         english_fields,
-        en_save_path
+        en_save_path,
+        vocab_size=en_vocab_size
     )
     
     # Train Telugu tokenizer
     tokenizer_te = train_tokenizer(
         raw_train_dataset,
         telugu_fields,
-        te_save_path
+        te_save_path,
+        vocab_size=te_vocab_size
     )
     
     return tokenizer_en, tokenizer_te
 
 def load_tokenizers(en_path: str, te_path: str) -> tuple[Tokenizer, Tokenizer]:
-    """Load pre-trained tokenizers."""
+    """Load pre-trained tokenizers.
+    
+    Args:
+        en_path: Path to English tokenizer
+        te_path: Path to Telugu tokenizer
+    
+    Returns:
+        Tuple of (English tokenizer, Telugu tokenizer)
+    """
     tokenizer_en = Tokenizer.from_file(en_path)
     tokenizer_te = Tokenizer.from_file(te_path)
     return tokenizer_en, tokenizer_te 
