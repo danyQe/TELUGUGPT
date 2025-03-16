@@ -26,7 +26,7 @@ TeluguGPT is a state-of-the-art neural machine translation model that translates
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/danyqe/TeluguGPT.git
+git clone https://github.com/danyQe/TeluguGPT.git
 cd TeluguGPT
 ```
 
